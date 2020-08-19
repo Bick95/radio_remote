@@ -4,7 +4,7 @@ import 'package:radio_remote/services/auth.dart';
 
 Widget appBarMain(BuildContext context) {
   return AppBar(
-    title: Image.asset("assets/images/db_chat.jpg", height: 50,),
+    title: Image.asset("assets/images/db_radio_remote.jpg", height: 50,),
     toolbarHeight: 54,
   );
 }
@@ -12,7 +12,7 @@ Widget appBarMain(BuildContext context) {
 Widget appBarWithLogout(BuildContext context, AuthMethods authMethods) {
   return AppBar(
     toolbarHeight: 54,
-    title: Image.asset("assets/images/db_chat.jpg", height: 50,),
+    title: Image.asset("assets/images/db_radio_remote.jpg", height: 50,),
     actions: [
       GestureDetector(
         onTap: (){
