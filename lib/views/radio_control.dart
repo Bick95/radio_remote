@@ -135,7 +135,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                           validator: (val){
                             return null; //RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_{|}~]+@[a-zA-Z0-9]+\.[a-zA-z]+").hasMatch(val) ? null : "Enter correct email!";
                           },
-                          autofocus: true,
+                          //autofocus: true,
                           controller: volTextEditingController,
                           style: TextStyle(
                               color: Colors.white,
