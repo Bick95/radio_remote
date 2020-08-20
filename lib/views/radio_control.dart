@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:radio_remote/services/auth.dart';
+import 'package:radio_remote/services/authentication.dart';
+import 'package:radio_remote/services/database.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
 class RadioControl extends StatefulWidget {
@@ -14,15 +17,70 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
 
   AuthMethods authMethods = new AuthMethods();
 
+  DatabaseMethods databaseMethods = new DatabaseMethods();
+  AuthenticationMethods authenticationMethods = new AuthenticationMethods();
+
+  TextEditingController volTextEditingController = new TextEditingController();
+
   Color backGroundColor = Colors.orange;
 
-  TextEditingController volTextEditingController = new TextEditingController(text: "160");
-
   bool circular = false;
+
+  // Initial prototype settings
+  String uid;
+  String deviceName;
+  String deviceType;
+  String screenHeader;
+  String currentStation;
+  int deviceVol;
+  int deviceState;
+  Color stateColor;
+
+  getUsers() async {
+    return await Firestore.instance.collection('users').getDocuments();
+  }
 
   toggleShape(){
     setState(() {
       circular = !circular;
+    });
+  }
+
+  setDeviceName(String name){
+    setState(() {
+      deviceName = name;
+      screenHeader = deviceName + ", " + deviceType;
+    });
+  }
+
+  setDeviceType(String type){
+    setState(() {
+      deviceType = type;
+      screenHeader = deviceName + ", " + deviceType;
+    });
+  }
+
+  setStation(String name){
+    setState(() {
+      currentStation = name;
+    });
+  }
+
+  setDeviceVol(int vol){
+    setState(() {
+      deviceVol = vol;
+      volTextEditingController.text = deviceVol.toString();
+    });
+  }
+
+  setDeviceState(int state){
+    setState(() {
+      deviceState = state;
+      if (deviceState > 0){
+        stateColor = Colors.lightGreen;
+      } else {
+        stateColor = Colors.redAccent;
+      }
     });
   }
 
@@ -36,7 +94,29 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
+
     super.initState();
+
+    //databaseMethods.addNewUser();
+    
+    var data = databaseMethods.getUserData();/*.then((value){
+      print("Val: " + value.data.toString());
+      print("Val: " + value.data["devices"].toString());
+    });
+    print("Returned: " + data.toString());*/
+
+    // Set database values
+    deviceName = "Raspi";
+    deviceType = "Radio";
+    screenHeader = "Raspi, Radio";
+    currentStation = "Radio HH";
+    deviceVol = 80;
+    deviceState = 0;
+    stateColor = Colors.redAccent;
+    volTextEditingController.text = deviceVol.toString();
+
+    // Set listeners/callbacks for updating states
+
   }
 
   @override
@@ -70,7 +150,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                   padding: EdgeInsets.symmetric(vertical: 12),
                   color: backGroundColor,
                   child: Text(
-                    "Raspi, Radio",
+                    screenHeader,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.black,
@@ -89,7 +169,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                 padding: EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Colors.lightGreen, //redAccent
+                    color: stateColor,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally
@@ -289,7 +369,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                       border: Border.all(color: Colors.blueGrey)
                     ),
                     child: Text(
-                      "Radio HH",
+                      currentStation,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 20,

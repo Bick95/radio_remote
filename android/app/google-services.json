@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "943348623128",
-    "firebase_url": "https://chatapp-b8a9d.firebaseio.com",
-    "project_id": "chatapp-b8a9d",
-    "storage_bucket": "chatapp-b8a9d.appspot.com"
+    "project_number": "547110115761",
+    "firebase_url": "https://radioproject-db.firebaseio.com",
+    "project_id": "radioproject-db",
+    "storage_bucket": "radioproject-db.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:943348623128:android:acaa17149bfa0092aca06d",
+        "mobilesdk_app_id": "1:547110115761:android:d6a4bebe30272c7577c590",
         "android_client_info": {
-          "package_name": "com.example.radio_remote"
+          "package_name": "com.DansHomeAutomation.MyRemote"
         }
       },
       "oauth_client": [
         {
-          "client_id": "943348623128-0v6l07dgkbeeb41oat5rr60u7gcolqoj.apps.googleusercontent.com",
+          "client_id": "547110115761-ao5mqfr408nhp2qiiupie54vs4nljov7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBLg6FQCfpqMJe-RkjphxLfSrzDV7bqD3I"
+          "current_key": "AIzaSyB6juMYFwxkk1aJ_YkF81P3pEQ2HWOw-Iw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "943348623128-0v6l07dgkbeeb41oat5rr60u7gcolqoj.apps.googleusercontent.com",
+              "client_id": "547110115761-ao5mqfr408nhp2qiiupie54vs4nljov7.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
