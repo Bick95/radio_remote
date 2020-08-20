@@ -6,7 +6,10 @@ class DatabaseMethods {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   Firestore firestore = Firestore.instance;
 
+  /*
   addNewUser() async {
+
+    // Test-wise
     firestore.collection("users").add(
         {
           "name" : "john",
@@ -21,6 +24,7 @@ class DatabaseMethods {
     });
 
   }
+  */
 
   getUserByUsername(String userName) async {
     return await firestore.collection("users").where("name", isEqualTo: userName).getDocuments();
@@ -39,8 +43,7 @@ class DatabaseMethods {
   getUserData() async {
     var firebaseUser = await FirebaseAuth.instance.currentUser();
     print(firebaseUser.uid);
-    return firestore.collection("users").document(/*firebaseUser.uid*/
-        "H8WIBIxmipAVBpThJMcX").get().then((value){
+    return firestore.collection("users").document(firebaseUser.uid).get().then((value){
       print(value.data);
       return value.data;
     });

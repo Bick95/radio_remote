@@ -1,9 +1,9 @@
-class User {
+class CustomUser {
 
   String userId;
 
   // Constructor
-  User(String userId) {
+  CustomUser(String userId) {
     // ignore: unnecessary_statements
     this.userId;
   }

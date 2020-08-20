@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:547110115761:android:d6a4bebe30272c7577c590",
+        "mobilesdk_app_id": "1:547110115761:android:691ee4a952694b5877c590",
         "android_client_info": {
-          "package_name": "com.DansHomeAutomation.MyRemote"
+          "package_name": "com.example.radio_remote"
         }
       },
       "oauth_client": [

@@ -4,18 +4,16 @@ import 'package:radio_remote/model/user.dart';
 class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  User _userFromFirebaseUser(FirebaseUser user) {
+  CustomUser _userFromFirebaseUser(FirebaseUser user) {
     /// CONDITION ? TRUE-CASE : FALSE-CASE
-    return user != null ? User(user.uid) : null;
+    return user != null ? CustomUser(user.uid) : null;
   }
 
   Future signInWithEmailAndPassword(String email, String password) async {
     try {
-      // await to wait for result to be returned
-      AuthResult result = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      FirebaseUser firebaseUser = result.user;
-      return _userFromFirebaseUser(firebaseUser);
-
+      FirebaseUser user = (await _auth.
+      signInWithEmailAndPassword(email: email, password: password)).user;
+      return user;
     } catch(e) {
       print(e.toString());
     }
@@ -23,9 +21,8 @@ class AuthMethods {
 
   Future signUpWithEmailAndPassword(String email, String password) async {
     try {
-      AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      FirebaseUser firebaseUser = result.user;
-      return _userFromFirebaseUser(firebaseUser);
+      FirebaseUser user = (await _auth.createUserWithEmailAndPassword(email: email, password: password)).user;
+      return user;
     } catch(e) {
       print(e.toString());
     }
