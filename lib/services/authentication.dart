@@ -2,9 +2,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthenticationMethods {
-  getCurrentUsersID() async {
+  getCurrentUsersID() {
     FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseUser user = await auth.currentUser();
+    var user = auth.currentUser;
     return user.uid;
   }
 }

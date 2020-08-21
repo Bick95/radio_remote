@@ -39,6 +39,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     });
   }
 
+  /*
   Widget searchList(){
     print("Search list!");
     print((searchSnapshot == null).toString());
@@ -56,7 +57,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     ) : Container(
       // Empty container...
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                 ],
               ),
             ),
-            searchList(),
+            /*searchList()*/null,
           ],
         ),
       ),

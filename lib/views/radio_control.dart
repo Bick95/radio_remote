@@ -37,7 +37,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
   Color stateColor;
 
   getUsers() async {
-    return await Firestore.instance.collection('users').getDocuments();
+    return null; //await Firestore.instance.collection('users').getDocuments();
   }
 
   toggleShape(){
@@ -99,7 +99,8 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
 
     //databaseMethods.addNewUser();
     
-    var data = databaseMethods.getUserData();/*.then((value){
+    //var data = databaseMethods.getUserData();
+    /*.then((value){
       print("Val: " + value.data.toString());
       print("Val: " + value.data["devices"].toString());
     });

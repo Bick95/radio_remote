@@ -58,7 +58,7 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
         print("Val: $val");
 
         // PUSH data to database!
-        var success = databaseMethods.uploadUserInfo(userInfoMap);  // TODO: Could alternatively return error message as return and null otherwise
+        var success = true; // TODO: FIX! databaseMethods.uploadUserInfo(userInfoMap);  // TODO: Could alternatively return error message as return and null otherwise
         print('Success: ' + success.toString());
 
         if (val != null && val.toString() == "Instance of 'User'"){
