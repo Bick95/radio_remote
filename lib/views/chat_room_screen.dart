@@ -5,6 +5,8 @@ import 'package:radio_remote/views/radio_control.dart';
 import 'package:radio_remote/views/search.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
+import 'device_list.dart';
+
 class ChatRoom extends StatefulWidget {
   @override
   _ChatRoomState createState() => _ChatRoomState();
@@ -36,7 +38,7 @@ class _ChatRoomState extends State<ChatRoom> with SingleTickerProviderStateMixin
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(
             //builder: (context) => SearchScreen()
-            builder: (context) => RadioControl(),
+            builder: (context) => DeviceList()//RadioControl(deviceName: "RadioControl",),
           ));
         },
       ),

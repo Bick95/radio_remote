@@ -1,44 +1,49 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:radio_remote/services/auth.dart';
-import 'package:radio_remote/services/authentication.dart';
 import 'package:radio_remote/services/database.dart';
+import 'package:radio_remote/views/add_radio_station.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
 class RadioControl extends StatefulWidget {
+  // Constructor
+  const RadioControl({
+    @required this.deviceId
+  }) : super();
+
+  final String deviceId;
+
   @override
-  _RadioControlState createState() => _RadioControlState();
+  _RadioControlState createState() => _RadioControlState(deviceId: deviceId);
 }
 
 class _RadioControlState extends State<RadioControl> with SingleTickerProviderStateMixin {
+  // Constructor
+  _RadioControlState({
+    @required this.deviceId
+  });
+
   AnimationController _controller;
 
   AuthMethods authMethods = new AuthMethods();
-
   DatabaseMethods databaseMethods = new DatabaseMethods();
-  AuthenticationMethods authenticationMethods = new AuthenticationMethods();
 
   TextEditingController volTextEditingController = new TextEditingController();
 
   Color backGroundColor = Colors.orange;
 
-  bool circular = false;
+  bool circular = true;
 
-  // Initial prototype settings
-  String uid;
+  // Device values
+  final String deviceId;
+  String deviceType = "Radio";
   String deviceName;
-  String deviceType;
   String screenHeader;
   String currentStation;
   int deviceVol;
   int deviceState;
   Color stateColor;
-
-  getUsers() async {
-    return null; //await Firestore.instance.collection('users').getDocuments();
-  }
 
   toggleShape(){
     setState(() {
@@ -92,7 +97,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
   }
 
   @override
-  void initState() {
+  Future<void> initState() {
     _controller = AnimationController(vsync: this);
 
     super.initState();
@@ -105,6 +110,14 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
       print("Val: " + value.data["devices"].toString());
     });
     print("Returned: " + data.toString());*/
+
+    // Get user data
+    databaseMethods.getUserData()/*.then((value){
+        print("User Values: " + value.toString());
+      }
+    )*/;
+    var value = databaseMethods.getDeviceData(deviceId);
+    print("+++ Returned value: " + value.toString());
 
     // Set database values
     deviceName = "Raspi";
@@ -135,7 +148,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(
             //builder: (context) => SearchScreen()
-            builder: (context) => RadioControl(),
+            builder: (context) => AddRadioStation(),
           ));
         },
       ),

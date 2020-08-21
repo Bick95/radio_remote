@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:radio_remote/services/auth.dart';
 
 class DatabaseMethods {
 
@@ -29,12 +30,34 @@ class DatabaseMethods {
   }
   */
 
+  getDB() {
+    return FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid);
+  }
+
   getUserByUsername(String userName) {
     //return await firebaseDB.
     //return await firestore.collection("users").where("name", isEqualTo: userName).getDocuments();
     var userData = FirebaseDatabase.instance.reference().child('users').child(userName);
     return userData;
   }
+
+  getUserData() {
+    FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).once().then((DataSnapshot data){
+      print("Values: " + data.value.toString());
+      print("Keys: " + data.key.toString());
+      return data;
+    });
+  }
+
+  getDeviceData(String deviceName) async {
+    var data;
+    FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").orderByChild("name").equalTo(deviceName).once().then((DataSnapshot data){
+      print("Device data: " + data.value.toString());
+      data = data.value;
+    });
+    return data;
+  }
+  
   /*
   bool uploadUserInfo(userMap){
     var success = true;

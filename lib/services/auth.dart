@@ -11,8 +11,9 @@ class AuthMethods {
 
   Future signInWithEmailAndPassword(String email, String password) async {
     try {
-      FirebaseUser user = (await _auth.
-      signInWithEmailAndPassword(email: email, password: password)).user;
+      final UserCredential authResult =
+        await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final User user = authResult.user;
       return user;
     } catch(e) {
       print(e.toString());
