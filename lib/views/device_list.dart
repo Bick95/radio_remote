@@ -51,15 +51,7 @@ class _DeviceListState extends State<DeviceList> {
                 shrinkWrap: true,
                 itemCount: deviceList.length,
                 itemBuilder: (BuildContext context, int index){
-                   return deviceList[index]; /*Card(
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: <Widget>[
-                         Text("Name: " + deviceList[index]["name"]),
-                         Text("Type: " + deviceList[index]["type"]),
-                       ],
-                     ),
-                   );*/
+                   return deviceList[index];
                 },
               );
             }

@@ -18,7 +18,7 @@ class _AddRadioStationState extends State<AddRadioStation> {
       body: Container(
         alignment: Alignment.center,
         color: Colors.white12,
-        child: Text("TODO: enable adding radio stations..."),
+        child: Text("TODO: enable adding & REMOVING(!!!) radio stations..."),
       ),
     );
   }

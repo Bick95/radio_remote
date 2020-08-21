@@ -18,8 +18,9 @@ class App extends StatelessWidget {
         // Check for errors
         if (snapshot.hasError) {
           return Container(
-            color: Colors.red,  // Error color code
-          ); //SomethingWentWrong();
+              alignment: Alignment.center,
+              child: Text("Something went wrong... Check your internet."),
+          );//Loading(); //SomethingWentWrong();
         }
 
         // Once complete, show your application
@@ -51,8 +52,9 @@ class App extends StatelessWidget {
 
         // Otherwise, show something whilst waiting for initialization to complete
         return Container(
-          color: Colors.black,
-        ); //Loading();
+            alignment: Alignment.center,
+            child: CircularProgressIndicator()
+        );//Loading();
       },
     );
   }
