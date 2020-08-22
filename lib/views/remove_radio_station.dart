@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,15 +19,29 @@ class _RemoveRadioStationState extends State<RemoveRadioStation> with SingleTick
 
   AuthMethods authMethods = new AuthMethods();
 
+  StreamSubscription streamSubscriptionStationsList;
+
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
     super.initState();
+
+    // Listener for Device State
+    streamSubscriptionStationsList = FirebaseDatabase.instance.reference().child("users").
+    child(FirebaseAuth.instance.currentUser.uid).child("radio_stations").onValue.listen((event) {
+      setState(() {
+        // pass
+      });
+    });
+
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    streamSubscriptionStationsList.cancel().then((value) {
+      print("Stream canceled!");
+    });
     super.dispose();
   }
 
@@ -139,7 +155,9 @@ class RadioStationRemovalTile extends StatelessWidget {
             GestureDetector(
               onTap: (){
                 print("Tapped " + stationName + ".");
-                // TODO: delete
+                FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("radio_stations").child(stationId).remove().then((value) {
+                  print("Removed...");
+                });
               },
               child: Container( // 'Msg button'
                 decoration: BoxDecoration(

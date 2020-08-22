@@ -127,7 +127,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
 
     // Listener for Device Volume
     streamSubscriptionStation = FirebaseDatabase.instance.reference().child("users").
-    child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).child("current_station").onValue.listen((event) {
+    child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).child("radio_info").child("current_station").onValue.listen((event) {
       setStation(event.snapshot.value);
     });
 
@@ -165,7 +165,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
       if (value != null) {
         // Observe current settings
         DataSnapshot snapshot = value as DataSnapshot;
-        int volChange = snapshot.value["vol_change"] as int;
+        int volChange = snapshot.value["meta_info"]["vol_change"] as int;
         print("Vol-change: " + volChange.toString());
         int currVol = snapshot.value["settings"]["vol"] as int;
         print("Current vol: " + currVol.toString());
@@ -189,7 +189,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
       print("Retrieved value: " + value.toString());
       if (value != null) {
         // Observe current settings
-        int volChange = snapshot.value["vol_change"] as int;
+        int volChange = snapshot.value["meta_info"]["vol_change"] as int;
         print("Vol-change: " + volChange.toString());
         int currVol = snapshot.value["settings"]["vol"] as int;
         print("Current vol: " + currVol.toString());
@@ -281,7 +281,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
           };
           FirebaseDatabase.instance.reference().child("users").child(
               FirebaseAuth.instance.currentUser.uid).child("devices").child(
-              deviceId).update(map2);
+              deviceId).child("radio_info").update(map2);
 
           print("Submitted.");
         }
@@ -321,23 +321,15 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
             builder: (context, AsyncSnapshot<DataSnapshot> snapshot){
               if (snapshot.hasData){
                 // Set fields
-                print("<>----<> Retrieved data: " + snapshot.data.value.toString());
-                deviceType = snapshot.data.value["type"];
-                print(deviceType);
-                deviceName = snapshot.data.value["name"];
-                print(deviceName);
+                print("Retrieved data: " + snapshot.data.value.toString());
+                deviceType = snapshot.data.value["meta_info"]["type"];
+                deviceName = snapshot.data.value["meta_info"]["name"];
                 screenHeader = deviceName + ", " + deviceType;
-                print(screenHeader);
-                currentStation = snapshot.data.value["current_station"];
-                print(currentStation);
+                currentStation = snapshot.data.value["radio_info"]["current_station"];
                 deviceVol = snapshot.data.value["settings"]["vol"];
                 volTextEditingController.text = deviceVol.toString();
-                print(deviceVol.runtimeType.toString());
                 deviceState = snapshot.data.value["settings"]["state"];
-                print(deviceState.toString());
                 stateColor = deviceState == 1 ? Colors.greenAccent : Colors.redAccent;
-                print(stateColor.toString());
-                print("Done.");
 
                 ////// +++ ########## +++ START UI +++ ########## +++ //////
                 return SingleChildScrollView(

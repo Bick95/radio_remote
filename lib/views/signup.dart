@@ -52,13 +52,6 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
     print(userName);
     print(userPassword);
 
-    // TODO: upload
-    Map<String, String> userInfoMap = {
-      // Create map as long as text fields are shown to the user (i.e. before changing screen)
-      "name": userName,
-      "email": userEmail,
-    };
-
     if (formKey.currentState.validate()){
       setState(() {
         isLoading = true;
@@ -85,6 +78,13 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
                 print("Val: " + val.toString());
 
                 if (val != null && val.runtimeType == User){
+                  // Upload user name
+                  FirebaseAuth.instance.currentUser.updateProfile(displayName: userName).then((value) {
+                    print("User name uploaded.");
+                  }).catchError((error){
+                    print("An error occurred when uploading user name.");
+                  });
+
                   Navigator.pushReplacement(context, MaterialPageRoute(
                       builder: (context) => DeviceList()
                   ));  // Without going back option
