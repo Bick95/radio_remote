@@ -111,6 +111,30 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
 
   // Methods for database manipulation
 
+  turnOnOff(){
+    FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).child("settings").once().then((value) {
+      print("Retrieved value: " + value.toString());
+      if (value != null) {
+        // Observe current settings
+        DataSnapshot snapshot = value as DataSnapshot;
+        int state = snapshot.value["state"] as int;
+        print("Retrieved state: " + state.toString());
+
+        // Calculate updated volume
+        int newState = ((state == 0) ? 1 : 0);
+        print("New state: " + newState.toString());
+        // Update new setting in database
+        var map = {
+          "state": newState,
+        };
+        FirebaseDatabase.instance.reference().child("users").child(
+            FirebaseAuth.instance.currentUser.uid).child("devices").child(
+            deviceId).child("settings").update(map);
+        print("Submitted.");
+      }
+    });
+  }
+
   updateFirebaseVol(bool increaseVol){
     FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).once().then((value) {
       print("Retrieved value: " + value.toString());
@@ -133,6 +157,44 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
             deviceId).child("settings").update(map);
         print("Submitted.");
       }
+    });
+  }
+
+  updateFirebaseStation(bool increaseStation){
+    FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).once().then((snapshot) {
+      FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("radio_stations").once().then((stations) {
+        print("Retrieved value: " + snapshot.value.toString());
+        if (snapshot != null && stations != null) {
+          // Observe number of stations
+          int numStations = stations.value.length;
+          print("Num stations object: " + stations.value.toString());
+          print("Num stations: " + numStations.toString());
+
+          // Observe current settings
+          int currStation = snapshot.value["settings"]["current_station_id"] as int;
+          print("CurrStation: " + currStation.toString());
+
+          // Calculate new station id
+          int newStation = (increaseStation ? (currStation +1) : currStation -1);
+          print("New station prior: " + newStation.toString());
+          // Make sure not to go out of bounds
+          if (newStation >= numStations){
+            newStation = 0;
+          } else if (newStation < 0){
+            newStation = numStations -1;
+          }
+          print("New station: " + newStation.toString());
+
+          // Update new setting in database
+          var map = {
+            "current_station_id": newStation,
+          };
+          FirebaseDatabase.instance.reference().child("users").child(
+              FirebaseAuth.instance.currentUser.uid).child("devices").child(
+              deviceId).child("settings").update(map);
+          print("Submitted.");
+        }
+      });
     });
   }
 
@@ -326,6 +388,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                               child: GestureDetector(
                                                 onTap: (){
                                                   print("Previous station...");
+                                                  updateFirebaseStation(false);
                                                 },
                                                 child: Container(
                                                   decoration: BoxDecoration(
@@ -344,6 +407,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                               child: GestureDetector(
                                                 onTap: (){
                                                   print("Start/Stop music.");
+                                                  turnOnOff();
                                                 },
                                                 child: Container(
                                                   decoration: BoxDecoration(
@@ -362,6 +426,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                               child: GestureDetector(
                                                 onTap: (){
                                                   print("Next station...");
+                                                  updateFirebaseStation(true);
                                                 },
                                                 child: Container(
                                                   decoration: BoxDecoration(
