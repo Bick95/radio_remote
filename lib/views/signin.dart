@@ -4,7 +4,7 @@ import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/views/device_list.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
-import 'chat_room_screen.dart';
+// TODO: add "Remember me"-option
 
 class SignIn extends StatefulWidget {
 

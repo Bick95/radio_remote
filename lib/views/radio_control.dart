@@ -105,8 +105,35 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
     super.initState();
 
     // Set listeners/callbacks for updating states
-    // TODO
+    // TODO !!!
 
+  }
+
+  // Methods for database manipulation
+
+  updateFirebaseVol(bool increaseVol){
+    FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).once().then((value) {
+      print("Retrieved value: " + value.toString());
+      if (value != null) {
+        // Observe current settings
+        DataSnapshot snapshot = value as DataSnapshot;
+        int volChange = snapshot.value["vol_change"] as int;
+        print("Vol-change: " + volChange.toString());
+        int currVol = snapshot.value["settings"]["vol"] as int;
+        print("Current vol: " + currVol.toString());
+        // Calculate updated volume
+        int newVol = increaseVol ? currVol + volChange : currVol - volChange;
+        print("New vol: " + newVol.toString());
+        // Update new setting in database
+        var map = {
+          "vol": newVol,
+        };
+        FirebaseDatabase.instance.reference().child("users").child(
+            FirebaseAuth.instance.currentUser.uid).child("devices").child(
+            deviceId).child("settings").update(map);
+        print("Submitted.");
+      }
+    });
   }
 
   @override
@@ -123,7 +150,6 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
         child: Icon(Icons.book),
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(
-            //builder: (context) => SearchScreen()
             builder: (context) => AddRadioStation(),
           ));
         },
@@ -276,6 +302,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                         child: GestureDetector(
                                           onTap: (){
                                             print("Volume up!!!");
+                                            updateFirebaseVol(true);
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
@@ -356,6 +383,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                         child: GestureDetector(
                                           onTap: (){
                                             print("Volume down!");
+                                            updateFirebaseVol(false);
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
