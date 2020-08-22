@@ -10,6 +10,8 @@ import 'package:radio_remote/services/database.dart';
 import 'package:radio_remote/views/add_radio_station.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
+import 'manage_radio_stations.dart';
+
 class RadioControl extends StatefulWidget {
   // Constructor
   const RadioControl({
@@ -309,7 +311,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
         child: Icon(Icons.book),
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(
-            builder: (context) => AddRadioStation(),
+            builder: (context) => ManageRadioStations(),
           ));
         },
       ),
@@ -363,65 +365,65 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                         Container(
                           // ##### Volume bar #####
                           color: backGroundColor,
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.symmetric(horizontal: 15),
                           child: Container(
                             height: 44,
-                            width: MediaQuery.of(context).size.width,
-                            padding: EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
                               color: stateColor,
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally
-                              crossAxisAlignment: CrossAxisAlignment.center, //Center Row contents vertically
-                              children: [
-                                Container(
-                                  //padding: EdgeInsets.only(bottom: 7),
-                                  child: Text(
-                                    "Vol: ",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  // Container to make sure text field is on same height as text "Vol:"
-                                  // Also shifts input curser position, unfortunately...
-                                  //padding: EdgeInsets.only(top: 8), //23
-                                  child: SizedBox(
-                                    height: 20,
-                                    width: 40,
-                                    child: TextFormField(
-                                      onFieldSubmitted: (value){
-                                        // https://www.geeksforgeeks.org/retrieve-data-from-textfields-in-flutter/
-                                        print("The value entered is : $value");
-                                        updateFirebaseVolManually(int.parse(value));
-                                      },
-                                      // Define keyboard type
-                                      keyboardType: TextInputType.number,
-                                      // Make sure user doesn't enter letters or punctuation
-                                      inputFormatters: <TextInputFormatter>[
-                                        WhitelistingTextInputFormatter.digitsOnly
-                                      ],
-                                      validator: (val){
-                                        return null; //RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_{|}~]+@[a-zA-Z0-9]+\.[a-zA-z]+").hasMatch(val) ? null : "Enter correct email!";
-                                      },
-                                      //autofocus: true,
-                                      controller: volTextEditingController,
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally
+                                crossAxisAlignment: CrossAxisAlignment.center, //Center Row contents vertically
+                                children: [
+                                  Container(
+                                    //padding: EdgeInsets.only(bottom: 7),
+                                    child: Text(
+                                      "Vol: ",
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16,
                                       ),
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                      ),
-                                      maxLines: 1,
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Container(
+                                    // Container to make sure text field is on same height as text "Vol:"
+                                    // Also shifts input curser position, unfortunately...
+                                    //padding: EdgeInsets.only(top: 8), //23
+                                    child: SizedBox(
+                                      height: 20,
+                                      width: 40,
+                                      child: TextFormField(
+                                        onFieldSubmitted: (value){
+                                          print("The value entered is : $value");
+                                          updateFirebaseVolManually(int.parse(value));
+                                        },
+                                        // Define keyboard type
+                                        keyboardType: TextInputType.number,
+                                        // Make sure user doesn't enter letters or punctuation
+                                        inputFormatters: <TextInputFormatter>[
+                                          WhitelistingTextInputFormatter.digitsOnly
+                                        ],
+                                        validator: (val){
+                                          return null;
+                                        },
+                                        controller: volTextEditingController,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                        ),
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

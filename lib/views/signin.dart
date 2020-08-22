@@ -54,6 +54,9 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
               builder: (context) => DeviceList()
           ));  // Without going back option
         }
+        setState(() {
+          isLoading = false;
+        });
       });
     }
   }
