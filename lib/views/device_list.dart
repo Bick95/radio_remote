@@ -37,17 +37,27 @@ class _DeviceListState extends State<DeviceList> {
             if (snapshot.hasData){
               deviceList.clear();
               Map<dynamic, dynamic> values = snapshot.data.value;
-              values.forEach((key, value) {
-                //deviceList.add(value);
-                deviceList.add(DeviceTile(deviceName: value["name"].toString(),
-                                          deviceType: value["type"].toString(),
-                                          deviceId: key.toString(),
-                               )
-                );
-                print("Value: " + value.toString());
-                print("Key: " + key.toString());
-              });
-              return new ListView.builder(
+              if (values != null){
+                values.forEach((key, value) {
+                  deviceList.add(DeviceTile(deviceName: value["name"].toString(),
+                    deviceType: value["type"].toString(),
+                    deviceId: key.toString(),
+                  )
+                  );
+                  print("Value: " + value.toString());
+                  print("Key: " + key.toString());
+                });
+              }
+              return deviceList.isEmpty ? Container(
+                alignment: Alignment.center,
+                child: Text(
+                  "No devices registered yet.",
+                  style: TextStyle(
+                    color: Colors.white12,
+                  ),
+                ),
+              ) :
+              new ListView.builder(
                 shrinkWrap: true,
                 itemCount: deviceList.length,
                 itemBuilder: (BuildContext context, int index){

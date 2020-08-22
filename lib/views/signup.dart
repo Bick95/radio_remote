@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/services/database.dart';
 import 'package:radio_remote/views/chat_room_screen.dart';
 import 'package:radio_remote/widgets/widget.dart';
+
+import 'device_list.dart';
 
 class SignUp extends StatefulWidget {
 
@@ -29,6 +32,7 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
   }
 
   bool isLoading = false;
+  String _error = null;
 
   AuthMethods authMethods = new AuthMethods();
   DatabaseMethods databaseMethods = new DatabaseMethods();
@@ -41,10 +45,18 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
 
   signMeUp(){
 
+    String userEmail = emailTextEditingController.text.trim();
+    String userName = userNameTextEditingController.text.trim();
+    String userPassword = passwordTextEditingController.text.trim();
+    print(userEmail);
+    print(userName);
+    print(userPassword);
+
+    // TODO: upload
     Map<String, String> userInfoMap = {
       // Create map as long as text fields are shown to the user (i.e. before changing screen)
-      "name": userNameTextEditingController.text,
-      "email": emailTextEditingController.text,
+      "name": userName,
+      "email": userEmail,
     };
 
     if (formKey.currentState.validate()){
@@ -52,25 +64,45 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
         isLoading = true;
       });
 
-      authMethods.signUpWithEmailAndPassword(
-          emailTextEditingController.text,
-          passwordTextEditingController.text).then((val){
-        print("Val: $val");
+      // Check whether email is registered already
+      FirebaseAuth.instance.fetchSignInMethodsForEmail(emailTextEditingController.text).catchError((error1){
+        print("Error (1): " + error1.toString());
+        _error = error1.toString();
+      }).then((result) {
 
-        // PUSH data to database!
-        var success = true; // TODO: FIX! databaseMethods.uploadUserInfo(userInfoMap);  // TODO: Could alternatively return error message as return and null otherwise
-        print('Success: ' + success.toString());
+        print("<><> Result: " + result.runtimeType.toString() + ", " + result.toString());
 
-        if (val != null && val.toString() == "Instance of 'User'"){
-          Navigator.pushReplacement(context, MaterialPageRoute(
-              builder: (context) => ChatRoom()
-          ));  // Without going back option
+        if (result.runtimeType == (List<String>()).runtimeType && result.isEmpty){
+
+          //////////////////////////////////////
+          authMethods.signUpWithEmailAndPassword(
+              userEmail,
+              userPassword).catchError((error2){
+                print("Error (2): " + error2.toString());
+                _error = error2.toString();
+          }).then((val){
+
+                print("Val: " + val.toString());
+
+                if (val != null && val.runtimeType == User){
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) => DeviceList()
+                  ));  // Without going back option
+                } else {
+                  print("####### ERROR #######");
+                  _error = val.toString();
+                }
+            });
+          /////////////////////////////////////
+
+        } else if (result.runtimeType == (List<String>()).runtimeType && result.isNotEmpty){
+          _error = "Email is already registered.";
         } else {
-          print("####### ERROR #######");
-          setState(() {
-            isLoading = false;
-          });
+          _error = "Some unspecified error occurred. Check inputs for correctness.";
         }
+        setState(() {
+          isLoading = false;
+        });
       });
     }
   }
@@ -96,8 +128,9 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
                     children: [
                       TextFormField(
                         validator: (val){
-                          return val.isEmpty || val.length < 2 ? "Provide user name with at least 4 chars." : null;
+                          return val.isEmpty || val.length < 1 ? "Provide user name with at least 1 character." : null;
                         },
+                        keyboardType: TextInputType.name,
                         controller: userNameTextEditingController,
                         style: simpleTextStyle(),
                         decoration: textFieldInputDecoration("username"),
@@ -106,6 +139,7 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
                         validator: (val){
                           return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_{|}~]+@[a-zA-Z0-9]+\.[a-zA-z]+").hasMatch(val) ? null : "Enter correct email!";
                         },
+                        keyboardType: TextInputType.emailAddress,
                         controller: emailTextEditingController,
                         style: simpleTextStyle(),
                         decoration: textFieldInputDecoration("email"),
@@ -115,6 +149,7 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
                         validator: (val){
                           return val.length >= 6 ? null : 'Provide stronger password!';
                         },
+                        keyboardType: TextInputType.visiblePassword,
                         controller: passwordTextEditingController,
                         style: simpleTextStyle(),
                         decoration: textFieldInputDecoration("password"),
@@ -129,6 +164,16 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Text("Forgot Password?", style: simpleTextStyle(),),
                   ),
+                ),
+                SizedBox(height: 16,),
+                Container(
+                  child: _error != null ? Text(
+                    "Error: " + _error,
+                    style: TextStyle(
+                      color: Colors.red,
+
+                    ),
+                  ) : Container(),
                 ),
                 SizedBox(height: 16,),
                 GestureDetector(

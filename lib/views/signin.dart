@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/views/device_list.dart';
@@ -59,7 +60,10 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return isLoading ? Container(
+      alignment: Alignment.center,
+      child: CircularProgressIndicator(),
+    ) : Scaffold(
       appBar: appBarMain(context),
       body: SingleChildScrollView  (
         child: Container(
