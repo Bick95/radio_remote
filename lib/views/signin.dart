@@ -76,12 +76,14 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                     validator: (val){
                       return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_{|}~]+@[a-zA-Z0-9]+\.[a-zA-z]+").hasMatch(val) ? null : "Enter valid email!";
                     },
+                    keyboardType: TextInputType.emailAddress,
                     controller: emailTextEditingController,
                     style: simpleTextStyle(),
                     decoration: textFieldInputDecoration("email"),
                   ),
                   TextFormField(
                     obscureText: true,
+                    keyboardType: TextInputType.visiblePassword,
                     validator: (val){
                       return val.length >= 6 ? null : 'Provide stronger password!';
                     },

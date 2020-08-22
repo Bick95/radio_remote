@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,6 +34,10 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
   DatabaseMethods databaseMethods = new DatabaseMethods();
 
   TextEditingController volTextEditingController = new TextEditingController();
+
+  StreamSubscription<Event> streamSubscriptionState;
+  StreamSubscription<Event> streamSubscriptionVol;
+  StreamSubscription<Event> streamSubscriptionStation;
 
   Color backGroundColor = Colors.orange;
 
@@ -70,6 +76,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
   setStation(String name){
     setState(() {
       currentStation = name;
+      print("Setting device state: " + name);
     });
   }
 
@@ -104,8 +111,23 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
 
     super.initState();
 
-    // Set listeners/callbacks for updating states
-    // TODO !!!
+    // Listener for Device State
+    streamSubscriptionState = FirebaseDatabase.instance.reference().child("users").
+    child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).child("settings").child("state").onValue.listen((event) {
+      setDeviceState(event.snapshot.value);
+    });
+
+    // Listener for Device Volume
+    streamSubscriptionVol = FirebaseDatabase.instance.reference().child("users").
+    child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).child("settings").child("vol").onValue.listen((event) {
+      setDeviceVol(event.snapshot.value);
+    });
+
+    // Listener for Device Volume
+    streamSubscriptionStation = FirebaseDatabase.instance.reference().child("users").
+    child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).child("current_station").onValue.listen((event) {
+      setStation(event.snapshot.value);
+    });
 
   }
 
@@ -160,11 +182,45 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
     });
   }
 
+  updateFirebaseVolManually(int value){
+    FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).once().then((snapshot) {
+      print("Retrieved value: " + value.toString());
+      if (value != null) {
+        // Observe current settings
+        int volChange = snapshot.value["vol_change"] as int;
+        print("Vol-change: " + volChange.toString());
+        int currVol = snapshot.value["settings"]["vol"] as int;
+        print("Current vol: " + currVol.toString());
+
+        // Set sensible bounds on manual user input
+        if (value < 0) {
+          value = 0;  // Lower bound
+        } else if (value > currVol + 5 * volChange) {
+          value = currVol + 5 * volChange;
+        }
+
+
+        // Update new setting in database
+        var map = {
+          "vol": value,
+        };
+        FirebaseDatabase.instance.reference().child("users").child(
+            FirebaseAuth.instance.currentUser.uid).child("devices").child(
+            deviceId).child("settings").update(map);
+        print("Submitted.");
+      }
+    });
+
+  }
+
   updateFirebaseStation(bool increaseStation){
     FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).once().then((snapshot) {
       FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("radio_stations").once().then((stations) {
         print("Retrieved value: " + snapshot.value.toString());
+
         if (snapshot != null && stations != null) {
+
+          /// PART 1 - Update station id (=index)///
           // Observe number of stations
           int numStations = stations.value.length;
           print("Num stations object: " + stations.value.toString());
@@ -192,6 +248,39 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
           FirebaseDatabase.instance.reference().child("users").child(
               FirebaseAuth.instance.currentUser.uid).child("devices").child(
               deviceId).child("settings").update(map);
+
+
+          /// PART 2 - Update station key for later station name retrieval, based on above index ///
+          // TODO: pack sorting with respect to keys into query
+          // Compute ordered list of available radio stations and their keys
+          var list = [];
+          Map<dynamic, dynamic> values = stations.value;
+          values.forEach((key, value) {
+            print(""); print("key: " + key.toString()); print("val: " + value.toString());
+            list.add({"key": key.toString(), "value": value,
+            });
+          });
+          list.sort(
+              (a, b){
+                return a["key"].compareTo(b["key"]);
+              }
+          );
+          print("Sorted List: " + list.toString());
+
+          // Compute name of new station key & name
+          String newStationKey = list[newStation]["key"].toString();
+          String newStationName = list[newStation]["value"]["name"].toString();
+
+          // Update new setting in database
+          map.clear();
+          var map2 = {
+            "current_station_key": newStationKey,
+            "current_station": newStationName,
+          };
+          FirebaseDatabase.instance.reference().child("users").child(
+              FirebaseAuth.instance.currentUser.uid).child("devices").child(
+              deviceId).update(map2);
+
           print("Submitted.");
         }
       });
@@ -200,7 +289,15 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
 
   @override
   void dispose() {
+    print("+++++ Disposing... +++++");
     _controller.dispose();
+    streamSubscriptionStation.cancel().then((value) {
+      streamSubscriptionState.cancel().then((value) {
+        streamSubscriptionVol.cancel().then((value) {
+          print("Done cancelling.");
+        });
+      });
+    });
     super.dispose();
   }
 
@@ -289,14 +386,6 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                     ),
                                   ),
                                 ),
-                                /*Text("160",
-                      // TODO: turn into text field for direct editing
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),*/
                                 Container(
                                   // Container to make sure text field is on same height as text "Vol:"
                                   // Also shifts input curser position, unfortunately...
@@ -308,6 +397,7 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                       onFieldSubmitted: (value){
                                         // https://www.geeksforgeeks.org/retrieve-data-from-textfields-in-flutter/
                                         print("The value entered is : $value");
+                                        updateFirebaseVolManually(int.parse(value));
                                       },
                                       // Define keyboard type
                                       keyboardType: TextInputType.number,
