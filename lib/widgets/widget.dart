@@ -1,6 +1,8 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:radio_remote/helper/authenticate.dart';
 import 'package:radio_remote/services/auth.dart';
+import 'package:radio_remote/views/generic_settings_update.dart';
 
 Widget appBarMain(BuildContext context) {
   return AppBar(
@@ -14,6 +16,38 @@ Widget appBarWithLogout(BuildContext context, AuthMethods authMethods) {
     toolbarHeight: 54,
     title: Image.asset("assets/images/db_radio_remote.jpg", height: 50,),
     actions: [
+      GestureDetector(
+        onTap: (){
+          authMethods.signOut();
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => Authenticate()
+          ));
+        },
+        child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Icon(Icons.exit_to_app)),
+      ),
+    ],
+  );
+}
+
+Widget appBarWithLogoutSettings(BuildContext context, AuthMethods authMethods, DatabaseReference ref, String header) {
+  return AppBar(
+    toolbarHeight: 54,
+    title: Image.asset("assets/images/db_radio_remote.jpg", height: 50,),
+    actions: [
+      GestureDetector(
+        onTap: (){
+          print("Settings...");
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) => GenericSettingsUpdate(databaseReference: ref, header: header)
+          ));
+        },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Icon(Icons.settings),
+        ),
+      ),
       GestureDetector(
         onTap: (){
           authMethods.signOut();

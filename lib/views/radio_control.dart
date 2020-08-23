@@ -7,10 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/services/database.dart';
-import 'package:radio_remote/views/add_radio_station.dart';
 import 'package:radio_remote/widgets/widget.dart';
-
 import 'manage_radio_stations.dart';
+
 
 class RadioControl extends StatefulWidget {
   // Constructor
@@ -305,8 +304,9 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    DatabaseReference ref = FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).child("meta_info");
     return Scaffold(
-      appBar: appBarWithLogout(context, authMethods),
+      appBar: appBarWithLogoutSettings(context, authMethods, ref, "Update Device Settings"),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.book),
         onPressed: (){
