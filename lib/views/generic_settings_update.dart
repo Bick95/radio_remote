@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/widgets/widget.dart';
@@ -21,7 +24,7 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
   DatabaseReference databaseReference;
   String header;
 
-  List settingsList = new List();
+  List<SettingsEditTile> settingsList = new List();
 
   _GenericSettingsUpdateState({@required this.databaseReference,
                                @required this.header});
@@ -29,6 +32,13 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
   AnimationController _controller;
 
   AuthMethods authMethods = new AuthMethods();
+
+  clearList(List<SettingsEditTile> list){
+    list.forEach((element) {
+      element.streamSubscription.cancel();
+    });
+    list.clear();
+  }
 
   @override
   void initState() {
@@ -42,7 +52,7 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
   void dispose() {
     _controller.dispose();
 
-    // TODO: cancle listeners
+    clearList(settingsList);
 
     super.dispose();
   }
@@ -54,8 +64,8 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
 
     return Scaffold(
       appBar: appBarWithLogout(context, authMethods),
-      body: // TODO: FutureBuilder: retrieve all data values & create list view inside future builder;
-      Container(
+      body:
+      SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: 16,),
@@ -70,6 +80,7 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
             ),
             SizedBox(height: 16,),
             Container(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "Update one field & click \"Update\" to change a respective field. Else go back to discard changes.",
                 style: TextStyle(
@@ -80,17 +91,19 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
             ),
             SizedBox(height: 16,),
             Container(
-              height: 500,
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: FutureBuilder(
                 future: databaseReference.once(),
                 builder: (context, AsyncSnapshot<DataSnapshot> snapshot){
                   if (snapshot.hasData){
-                    settingsList.clear();
+                    clearList(settingsList);
                     Map<dynamic, dynamic> values = snapshot.data.value;
                     if (values != null){
                       values.forEach((key, value) {
-                        settingsList.add(SettingsEditTile(keyName: key.toString(),
-                          value: value.toString(), databaseReference: databaseReference,
+                        settingsList.add(SettingsEditTile(
+                          key.toString(),
+                          value.toString(),
+                          databaseReference,
                         )
                         );
                         print("Key: " + value.toString());
@@ -131,18 +144,30 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
 
 class SettingsEditTile extends StatelessWidget {
 
-  final String keyName;
+  String keyName;
   String value;
   DatabaseReference databaseReference;
+  StreamSubscription streamSubscription;
   TextEditingController textEditingController = new TextEditingController();
 
-  SettingsEditTile({@required this.keyName,
+  /*SettingsEditTile({@required this.keyName,
                     @required this.value,
-                    @required this.databaseReference});
+                    @required this.databaseReference});*/
+
+  SettingsEditTile(this.keyName,
+                   this.value,
+                   this.databaseReference){
+    print("");
+    // Add value change listener
+    streamSubscription = databaseReference.child(keyName).onValue.listen((event) {
+      print("Value changed! Key: " + keyName.toString() + ", Value: " + event.snapshot.value.toString());
+      textEditingController.text = event.snapshot.value.toString();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    textEditingController.text = value;
+    textEditingController.text = value.toString();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Container(

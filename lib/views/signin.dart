@@ -97,6 +97,9 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                     controller: passwordTextEditingController,
                     style: simpleTextStyle(),
                     decoration: textFieldInputDecoration("password"),
+                    onFieldSubmitted: (value){
+                      signMeIn();
+                    },
                   ),
                   SizedBox(height: 8,), // Space
                   Container(

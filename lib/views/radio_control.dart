@@ -316,232 +316,103 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
         },
       ),
       body:
-          FutureBuilder(
-            future: FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).once(),
-            builder: (context, AsyncSnapshot<DataSnapshot> snapshot){
-              if (snapshot.hasData){
-                // Set fields
-                print("Retrieved data: " + snapshot.data.value.toString());
-                deviceType = snapshot.data.value["meta_info"]["type"];
-                deviceName = snapshot.data.value["meta_info"]["name"];
-                screenHeader = deviceName + ", " + deviceType;
-                currentStation = snapshot.data.value["radio_info"]["current_station"];
-                deviceVol = snapshot.data.value["settings"]["vol"];
-                volTextEditingController.text = deviceVol.toString();
-                deviceState = snapshot.data.value["settings"]["state"];
-                stateColor = deviceState == 1 ? Colors.greenAccent : Colors.redAccent;
+          SingleChildScrollView(
+            child: Container(
+              child: FutureBuilder(
+                future: FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("devices").child(deviceId).once(),
+                builder: (context, AsyncSnapshot<DataSnapshot> snapshot){
+                  if (snapshot.hasData){
+                    // Set fields
+                    print("Retrieved data: " + snapshot.data.value.toString());
+                    deviceType = snapshot.data.value["meta_info"]["type"];
+                    deviceName = snapshot.data.value["meta_info"]["name"];
+                    screenHeader = deviceName + ", " + deviceType;
+                    currentStation = snapshot.data.value["radio_info"]["current_station"];
+                    deviceVol = snapshot.data.value["settings"]["vol"];
+                    volTextEditingController.text = deviceVol.toString();
+                    deviceState = snapshot.data.value["settings"]["state"];
+                    stateColor = deviceState == 1 ? Colors.greenAccent : Colors.redAccent;
 
-                ////// +++ ########## +++ START UI +++ ########## +++ //////
-                return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Row(
-                          // Device info
+                    ////// +++ ########## +++ START UI +++ ########## +++ //////
+                    return SingleChildScrollView(
+                        child: Column(
                           children: [
-                            Container(
-                              height: 44,
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              color: backGroundColor,
-                              child: Text(
-                                screenHeader,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
+                            Row(
+                              // Device info
+                              children: [
+                                Container(
+                                  height: 44,
+                                  width: MediaQuery.of(context).size.width,
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  color: backGroundColor,
+                                  child: Text(
+                                    screenHeader,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                        Container(
-                          // ##### Volume bar #####
-                          color: backGroundColor,
-                          width: MediaQuery.of(context).size.width,
-                          padding: EdgeInsets.symmetric(horizontal: 15),
-                          child: Container(
-                            height: 44,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: stateColor,
-                            ),
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally
-                                crossAxisAlignment: CrossAxisAlignment.center, //Center Row contents vertically
-                                children: [
-                                  Container(
-                                    //padding: EdgeInsets.only(bottom: 7),
-                                    child: Text(
-                                      "Vol: ",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    // Container to make sure text field is on same height as text "Vol:"
-                                    // Also shifts input curser position, unfortunately...
-                                    //padding: EdgeInsets.only(top: 8), //23
-                                    child: SizedBox(
-                                      height: 20,
-                                      width: 40,
-                                      child: TextFormField(
-                                        onFieldSubmitted: (value){
-                                          print("The value entered is : $value");
-                                          updateFirebaseVolManually(int.parse(value));
-                                        },
-                                        // Define keyboard type
-                                        keyboardType: TextInputType.number,
-                                        // Make sure user doesn't enter letters or punctuation
-                                        inputFormatters: <TextInputFormatter>[
-                                          WhitelistingTextInputFormatter.digitsOnly
-                                        ],
-                                        validator: (val){
-                                          return null;
-                                        },
-                                        controller: volTextEditingController,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                        ),
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          // Circle element
-                          height: MediaQuery.of(context).size.height - 54 - 88 - 24,
-                          width: MediaQuery.of(context).size.width,
-                          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height - 54 - 88 - 24)/7.0,
-                          color: backGroundColor,
-                          child: Column(
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  toggleShape();
-                                },
-                                child: Container(
-                                  // ##### CIRCLE #####
-                                  width: 220,
-                                  height: 220,
-                                  decoration: BoxDecoration(
-                                    shape: returnCurrentBoxShape(),
-                                    color: Colors.redAccent, // orange, redAccent, tealAccent
-                                  ),
-                                  child: Column(
-                                    // ##### Column inside circle #####
+                            Container(
+                              // ##### Volume bar #####
+                              color: backGroundColor,
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: Container(
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: stateColor,
+                                ),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally
+                                    crossAxisAlignment: CrossAxisAlignment.center, //Center Row contents vertically
                                     children: [
                                       Container(
-                                        // ##### Top row of circle: Vol up #####
-                                        height: 220/3,
-                                        child: GestureDetector(
-                                          onTap: (){
-                                            print("Volume up!!!");
-                                            updateFirebaseVol(true);
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.white10,
-                                            ),
-                                            child: Icon(
-                                              Icons.add,
-                                            ),
+                                        //padding: EdgeInsets.only(bottom: 7),
+                                        child: Text(
+                                          "Vol: ",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ),
                                       Container(
-                                        // ##### Middle row of circle #####
-                                        height: 220/3,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              // ##### Arrow left: previous station #####
-                                              width: 220/3,
-                                              child: GestureDetector(
-                                                onTap: (){
-                                                  print("Previous station...");
-                                                  updateFirebaseStation(false);
-                                                },
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white10,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.arrow_left,
-                                                  ),
-                                                ),
-                                              ),
+                                        // Container to make sure text field is on same height as text "Vol:"
+                                        // Also shifts input curser position, unfortunately...
+                                        //padding: EdgeInsets.only(top: 8), //23
+                                        child: SizedBox(
+                                          height: 20,
+                                          width: 40,
+                                          child: TextFormField(
+                                            onFieldSubmitted: (value){
+                                              print("The value entered is : $value");
+                                              updateFirebaseVolManually(int.parse(value));
+                                            },
+                                            // Define keyboard type
+                                            keyboardType: TextInputType.number,
+                                            // Make sure user doesn't enter letters or punctuation
+                                            inputFormatters: <TextInputFormatter>[
+                                              WhitelistingTextInputFormatter.digitsOnly
+                                            ],
+                                            validator: (val){
+                                              return null;
+                                            },
+                                            controller: volTextEditingController,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
                                             ),
-                                            Container(
-                                              // ##### Start/Stop music #####
-                                              width: 220/3,
-                                              child: GestureDetector(
-                                                onTap: (){
-                                                  print("Start/Stop music.");
-                                                  turnOnOff();
-                                                },
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white10,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.audiotrack,
-                                                  ),
-                                                ),
-                                              ),
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
                                             ),
-                                            Container(
-                                              // ##### Arrow right: next station #####
-                                              width: 220/3,
-                                              child: GestureDetector(
-                                                onTap: (){
-                                                  print("Next station...");
-                                                  updateFirebaseStation(true);
-                                                },
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white10,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.arrow_right,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        // ##### Bottom Row of circle #####
-                                        height: 220/3,
-                                        child: GestureDetector(
-                                          onTap: (){
-                                            print("Volume down!");
-                                            updateFirebaseVol(false);
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.white10,
-                                            ),
-                                            child: Icon(
-                                              Icons.remove,
-                                            ),
+                                            maxLines: 1,
                                           ),
                                         ),
                                       ),
@@ -549,43 +420,176 @@ class _RadioControlState extends State<RadioControl> with SingleTickerProviderSt
                                   ),
                                 ),
                               ),
-                              Container(
-                                  height: 40,
-                                  width: MediaQuery.of(context).size.width - 50,
-                                  margin: const EdgeInsets.all(30.0),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4.0,
-                                    vertical: 4.0,
-                                  ),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.blueGrey)
-                                  ),
-                                  child: Text(
-                                    currentStation,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 20,
+                            ),
+                            Container(
+                              // Circle element
+                              height: MediaQuery.of(context).size.height - 54 - 88 - 24,
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height - 54 - 88 - 24)/7.0,
+                              color: backGroundColor,
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: (){
+                                      toggleShape();
+                                    },
+                                    child: Container(
+                                      // ##### CIRCLE #####
+                                      width: 220,
+                                      height: 220,
+                                      decoration: BoxDecoration(
+                                        shape: returnCurrentBoxShape(),
+                                        color: Colors.redAccent, // orange, redAccent, tealAccent
+                                      ),
+                                      child: Column(
+                                        // ##### Column inside circle #####
+                                        children: [
+                                          Container(
+                                            // ##### Top row of circle: Vol up #####
+                                            height: 220/3,
+                                            child: GestureDetector(
+                                              onTap: (){
+                                                print("Volume up!!!");
+                                                updateFirebaseVol(true);
+                                              },
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.white10,
+                                                ),
+                                                child: Icon(
+                                                  Icons.add,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            // ##### Middle row of circle #####
+                                            height: 220/3,
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  // ##### Arrow left: previous station #####
+                                                  width: 220/3,
+                                                  child: GestureDetector(
+                                                    onTap: (){
+                                                      print("Previous station...");
+                                                      updateFirebaseStation(false);
+                                                    },
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.white10,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.arrow_left,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  // ##### Start/Stop music #####
+                                                  width: 220/3,
+                                                  child: GestureDetector(
+                                                    onTap: (){
+                                                      print("Start/Stop music.");
+                                                      turnOnOff();
+                                                    },
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.white10,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.audiotrack,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  // ##### Arrow right: next station #####
+                                                  width: 220/3,
+                                                  child: GestureDetector(
+                                                    onTap: (){
+                                                      print("Next station...");
+                                                      updateFirebaseStation(true);
+                                                    },
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.white10,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.arrow_right,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            // ##### Bottom Row of circle #####
+                                            height: 220/3,
+                                            child: GestureDetector(
+                                              onTap: (){
+                                                print("Volume down!");
+                                                updateFirebaseVol(false);
+                                              },
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.white10,
+                                                ),
+                                                child: Icon(
+                                                  Icons.remove,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  )
+                                  ),
+                                  Container(
+                                      height: 40,
+                                      width: MediaQuery.of(context).size.width - 50,
+                                      margin: const EdgeInsets.all(30.0),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                        vertical: 4.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.blueGrey)
+                                      ),
+                                      child: Text(
+                                        currentStation,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                      )
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-              ////// +++ ########## +++ END UI +++ ########## +++ //////
-              }  else if (snapshot.hasError) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.white12,
-                  child: Text("Something went wrong."),
-                );
-              }
-              return Container(
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator());
-            },
+                      );
+                  ////// +++ ########## +++ END UI +++ ########## +++ //////
+                  }  else if (snapshot.hasError) {
+                    return Container(
+                      alignment: Alignment.center,
+                      color: Colors.white12,
+                      child: Text("Something went wrong."),
+                    );
+                  }
+                  return Container(
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator());
+                },
+              ),
+            ),
           ),
 
     );

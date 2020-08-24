@@ -31,6 +31,7 @@ class _DeviceListState extends State<DeviceList> {
         },
       ),
       body: Container(
+        //padding: EdgeInsets.symmetric(horizontal: 8),
         child: FutureBuilder(
           future: FirebaseDatabase.instance.reference().child("users").child(FirebaseAuth.instance.currentUser.uid).child("device_list").once(),
           builder: (context, AsyncSnapshot<DataSnapshot> snapshot){
@@ -89,7 +90,7 @@ class DeviceTile extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Container(
-        padding: EdgeInsets.all(5),
+        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 12),
         color: Colors.white12,
         child: Row(
           children: [

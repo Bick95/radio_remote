@@ -50,10 +50,10 @@ class _RemoveRadioStationState extends State<RemoveRadioStation> with SingleTick
     return Scaffold(
       appBar: appBarWithLogout(context, authMethods),
       body: SingleChildScrollView(
-
         child: ConstrainedBox(
           constraints: BoxConstraints(),
           child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
                 SizedBox(height: 16,),
