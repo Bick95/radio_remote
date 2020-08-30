@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/views/device_list.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
 // TODO: add "Remember me"-option
+
+// TODO: add error message when login was unsuccessful
 
 class SignIn extends StatefulWidget {
 
@@ -21,6 +24,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
+    _readSaveStorage();
     super.initState();
   }
 
@@ -34,6 +38,10 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
 
   AuthMethods authMethods = new AuthMethods();
 
+  final _storage = FlutterSecureStorage();
+  LoginInfo _loginInfo;
+  bool rememberMe = false;
+
   final formKey = GlobalKey<FormState>();
 
   TextEditingController emailTextEditingController = new TextEditingController();
@@ -45,11 +53,25 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
         isLoading = true;
       });
 
+      String email = emailTextEditingController.text.trim();
+      String password = passwordTextEditingController.text.trim();
+
       authMethods.signInWithEmailAndPassword(
-          emailTextEditingController.text.trim(),
-          passwordTextEditingController.text.trim()).then((val){
+          email,
+          password).then((val){
         print("Val::: $val");
         if (val != null && val.runtimeType == User){
+          // Save latest log in data if user wants to
+          if (rememberMe){
+            _storage.write(key: "username", value: email);
+            _storage.write(key: "password", value: password);
+          } else {
+            // Erase what was (potentially) in storage
+            _storage.write(key: "username", value: "");
+            _storage.write(key: "password", value: "");
+          }
+
+          // Go to next page
           Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) => DeviceList()
           ));  // Without going back option
@@ -57,6 +79,39 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
         setState(() {
           isLoading = false;
         });
+      });
+    }
+  }
+
+  Future<Null> _readSaveStorage() async {
+    // Read in user's credentials if saved & insert it into TextFormFields
+    try {
+      final all = await _storage.readAll();
+      setState(() {
+        if (all.containsKey("username") && all.containsKey("password")){
+
+          // Get stored credentials
+          String email = all["username"];
+          String password = all["password"];
+
+          // Set credentials into respective text fields
+          emailTextEditingController.text = email;
+          passwordTextEditingController.text = password;
+
+          if (email != "" && password != ""){
+            rememberMe = true; // Data was stored, so default to do it again
+          }
+
+          // Following specific return value not necessarily required anymore
+          return _loginInfo = LoginInfo(all["username"], all["password"]);
+        } else {
+          return _loginInfo = null;
+        }
+      });
+    } catch (exception) {
+      print("No data safely stored? Exception: " + exception.toString());
+      setState(() {
+        return _loginInfo = null;
       });
     }
   }
@@ -102,12 +157,39 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                     },
                   ),
                   SizedBox(height: 8,), // Space
-                  Container(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Text("Forgot Password?", style: simpleTextStyle(),),
-                    ),
+                  Row(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            //color: Colors.white,
+                            alignment: Alignment.centerLeft,
+                            child: Checkbox(
+                              value: rememberMe,
+                              checkColor: Colors.white,
+                              activeColor: Colors.lightBlue,
+                              focusColor: Colors.green,
+                              hoverColor: Colors.red,
+                              onChanged: (value){
+                                print("Value: " + value.toString());
+                                setState(() {
+                                  rememberMe = value;
+                                });
+                              }
+                            ),
+                          ),
+                          Text("Remember me.", style: simpleTextStyle(),),
+                        ],
+                      ),
+                      SizedBox(width: 25,),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text("Forgot Password?", style: simpleTextStyle(),),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 16,),
                   GestureDetector(
@@ -174,4 +256,12 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
       ),
     );
   }
+}
+
+class LoginInfo {
+
+  LoginInfo(this.username, this.password);
+
+  final String username;
+  final String password;
 }
