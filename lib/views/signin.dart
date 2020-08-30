@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/views/device_list.dart';
+import 'package:radio_remote/views/reset_password.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
 
@@ -212,7 +213,24 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                         alignment: Alignment.centerRight,
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Text("Forgot Password?", style: simpleTextStyle(),),  // TODO: implement
+                          child: GestureDetector(
+                            onTap: (){
+                              Navigator.push(context,
+                                MaterialPageRoute(
+                                  builder: (context) => ResetPassword()
+                                ),
+                              );
+                            },
+                            child: Container(
+                              child: Text("Forgot Password?",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  decoration: TextDecoration.underline
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
