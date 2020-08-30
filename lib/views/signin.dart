@@ -6,8 +6,6 @@ import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/views/device_list.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
-// TODO: add "Remember me"-option
-
 // TODO: add error message when login was unsuccessful
 
 class SignIn extends StatefulWidget {
@@ -39,7 +37,6 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
   AuthMethods authMethods = new AuthMethods();
 
   final _storage = FlutterSecureStorage();
-  LoginInfo _loginInfo;
   bool rememberMe = false;
 
   final formKey = GlobalKey<FormState>();
@@ -89,7 +86,6 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
       final all = await _storage.readAll();
       setState(() {
         if (all.containsKey("username") && all.containsKey("password")){
-
           // Get stored credentials
           String email = all["username"];
           String password = all["password"];
@@ -101,18 +97,10 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
           if (email != "" && password != ""){
             rememberMe = true; // Data was stored, so default to do it again
           }
-
-          // Following specific return value not necessarily required anymore
-          return _loginInfo = LoginInfo(all["username"], all["password"]);
-        } else {
-          return _loginInfo = null;
         }
       });
     } catch (exception) {
       print("No data safely stored? Exception: " + exception.toString());
-      setState(() {
-        return _loginInfo = null;
-      });
     }
   }
 
@@ -256,12 +244,4 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
       ),
     );
   }
-}
-
-class LoginInfo {
-
-  LoginInfo(this.username, this.password);
-
-  final String username;
-  final String password;
 }
