@@ -171,7 +171,6 @@ class _SignUpState extends State<SignUp> with SingleTickerProviderStateMixin {
                     "Error: " + _error,
                     style: TextStyle(
                       color: Colors.red,
-
                     ),
                   ) : Container(),
                 ),

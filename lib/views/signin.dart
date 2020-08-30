@@ -6,7 +6,6 @@ import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/views/device_list.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
-// TODO: add error message when login was unsuccessful
 
 class SignIn extends StatefulWidget {
 
@@ -24,6 +23,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
     _controller = AnimationController(vsync: this);
     _readSaveStorage();
     super.initState();
+    _error = null;
   }
 
   @override
@@ -35,6 +35,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
   bool isLoading = false;
 
   AuthMethods authMethods = new AuthMethods();
+  String _error;
 
   final _storage = FlutterSecureStorage();
   bool rememberMe = false;
@@ -62,6 +63,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
           if (rememberMe){
             _storage.write(key: "username", value: email);
             _storage.write(key: "password", value: password);
+            _error = null;
           } else {
             // Erase what was (potentially) in storage
             _storage.write(key: "username", value: "");
@@ -75,6 +77,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
         }
         setState(() {
           isLoading = false;
+          _error = "Login failed!";
         });
       });
     }
@@ -144,8 +147,22 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                       signMeIn();
                     },
                   ),
-                  SizedBox(height: 8,), // Space
+                  _error != null ? Column(
+                    children: [
+                      SizedBox(height: 16,), // Space
+                      Container(
+                        child: Text(
+                          "Error: " + _error,
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ) : Container(),
+                  SizedBox(height: 8,),
                   Row(
+                    // Contents: rememberMe chckBox, rememberMe text, Forgot PW? text
                     children: [
                       Row(
                         children: [
@@ -158,8 +175,6 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                               value: rememberMe,
                               checkColor: Colors.white,
                               activeColor: Colors.lightBlue,
-                              focusColor: Colors.green,
-                              hoverColor: Colors.red,
                               onChanged: (value){
                                 print("Value: " + value.toString());
                                 setState(() {
@@ -177,13 +192,14 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                         alignment: Alignment.centerRight,
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Text("Forgot Password?", style: simpleTextStyle(),),
+                          child: Text("Forgot Password?", style: simpleTextStyle(),),  // TODO: implement
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 16,),
                   GestureDetector(
+                    // Blue SignIn button
                     onTap: (){
                       signMeIn();
                     },
@@ -221,7 +237,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Don't have account? ", style: mediumTextStyle(),),  // TODO: continue...
+                      Text("Don't have account? ", style: mediumTextStyle(),),
                       GestureDetector(
                         onTap: () {
                           widget.toggle();
