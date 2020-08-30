@@ -150,7 +150,9 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                       Row(
                         children: [
                           Container(
-                            //color: Colors.white,
+                            color: Colors.white,
+                            width: 18,
+                            height: 19,
                             alignment: Alignment.centerLeft,
                             child: Checkbox(
                               value: rememberMe,
@@ -166,6 +168,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                               }
                             ),
                           ),
+                          SizedBox(width: 5,),
                           Text("Remember me.", style: simpleTextStyle(),),
                         ],
                       ),
