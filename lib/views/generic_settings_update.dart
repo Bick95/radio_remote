@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
@@ -91,6 +92,7 @@ class _GenericSettingsUpdateState extends State<GenericSettingsUpdate> with Sing
             ),
             SizedBox(height: 16,),
             Container(
+              height: MediaQuery.of(context).size.height - 200,
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: FutureBuilder(
                 future: databaseReference.once(),

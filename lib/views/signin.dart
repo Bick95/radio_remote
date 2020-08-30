@@ -45,6 +45,13 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
   TextEditingController emailTextEditingController = new TextEditingController();
   TextEditingController passwordTextEditingController = new TextEditingController();
 
+  toggleRememberMe(){
+    setState(() {
+      print("Toggled remember me...");
+      rememberMe = !rememberMe;
+    });
+  }
+
   signMeIn(){
     if (formKey.currentState.validate()){
       setState(() {
@@ -74,11 +81,14 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
           Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) => DeviceList()
           ));  // Without going back option
+        } else {
+          _error = "Login failed! Check email and password.";
         }
         setState(() {
           isLoading = false;
-          _error = "Login failed!";
         });
+      }).catchError((error){
+        _error = "Login failed! Unexpected error. Internet?";
       });
     }
   }
@@ -162,7 +172,7 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                   ) : Container(),
                   SizedBox(height: 8,),
                   Row(
-                    // Contents: rememberMe chckBox, rememberMe text, Forgot PW? text
+                    // Contents: rememberMe checkBox, rememberMe text, Forgot PW? text
                     children: [
                       Row(
                         children: [
@@ -184,10 +194,20 @@ class _SignInState extends State<SignIn> with SingleTickerProviderStateMixin {
                             ),
                           ),
                           SizedBox(width: 5,),
-                          Text("Remember me.", style: simpleTextStyle(),),
+                          GestureDetector(
+                            onTap: (){
+                              toggleRememberMe();
+                            },
+                            child: Container(
+                                child: Text(
+                                  "Remember me.",
+                                  style: simpleTextStyle(),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                      SizedBox(width: 25,),
+                      SizedBox(width: MediaQuery.of(context).size.width- 48 - 300,),  //19
                       Container(
                         alignment: Alignment.centerRight,
                         child: Container(

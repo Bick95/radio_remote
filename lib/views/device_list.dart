@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:radio_remote/helper/utils.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/services/database.dart';
 import 'package:radio_remote/views/add_device.dart';
@@ -96,8 +99,11 @@ class DeviceTile extends StatelessWidget {
           children: [
             Column( // Name and email
               children: [
-                Text("Name: " + deviceName, style: simpleTextStyle(),),
-                Text("Type: " + deviceType, style: simpleTextStyle(),),
+                // min operator to enforce max length of text (avoid text going out of bounds)
+                Text("Name: " + shortenText(deviceName),
+                  style: simpleTextStyle(),),
+                Text("Type: " + shortenText(deviceType),
+                  style: simpleTextStyle(),),
               ],
             ),
             Spacer(),

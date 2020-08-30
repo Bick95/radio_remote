@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:radio_remote/helper/utils.dart';
 import 'package:radio_remote/services/auth.dart';
 import 'package:radio_remote/widgets/widget.dart';
 
@@ -147,8 +149,10 @@ class RadioStationRemovalTile extends StatelessWidget {
           children: [
             Column( // Name and email
               children: [
-                Text("Name: " + stationName, style: simpleTextStyle(),),
-                Text("Url: " + stationUrl, style: simpleTextStyle(),),
+                Text("Name: " + shortenText(stationName),
+                  style: simpleTextStyle(),),
+                Text("Url: " + shortenText(stationUrl),
+                  style: simpleTextStyle(),),
               ],
             ),
             Spacer(),
